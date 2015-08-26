@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<!-- 
+@title: WHAT CAN I FARM? 
+@author: jasmine hsu
+@contact: jch550@nyu.edu
+-->
+
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="A crop recommendation tool for the novice organic farmer.">
+    <meta name="author" content="Jasmine Hsu">
+    <head profile="http://www.w3.org/2005/10/profile">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='imgs/tractor-simple.png') }}">
+
+  <title>What Can I Farm? -- Organic farming for the masses</title>
+
+<style>
+      .container {
+        max-width: 1000px;
+      }
+</style>
+
+
+  </head>
+  <body>
+
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/custom.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/weather-icons.min.css') }}">
+
+
+    <div id="wrap"> 
+
+    <!-- container start -->
+
+    <div class="container">
+      <!-- main panel for user -->
+      <div class="jumbotron" style="padding-top:12px" id="top">
+          <h1>WHAT CAN I FARM?</h1>
+            <p>A crop recommendation tool for the novice organic farmer.</p>
+
+          <!-- submit button -->
+        <form role="form" method="POST" action="/">
+          <div class="form-group">
+            <input type="text" name="zip" class="form-control" id="zip-box" placeholder="Enter Zipcode..." style="max-width: 300px;">
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+      <!-- end main panel for user -->
+      {% block content %}
+
+      <!-- start row: location and rankings -->
+
+      <div class "row">
+
+      <div class="col-md-5"> <!-- start map -->
+        {% if results.invalidZip == False %}
+          <h2><img src="{{ url_for('static', filename='imgs/city.png') }}" height=45px> Location</h2>
+            <font size=4px>
+              <!-- start loc -->
+            <p>Your location is: <span id="zip"></span> {{results.zipcode}}</p>
+
+              <!-- start weather -->
+
+            {% if results.weather %}
+              <p>Current Weather Conditions:<br>
+
+               <h2 style="display: inline;"><i class="wi {{ results.weather['icon'] }}"></i></h2>  {{ results.weather['temp'] }} &deg;F: {{ results.weather['description'].capitalize() }}<br /><br>
+              <small>High {{ results.weather['min'] }}/Low {{ results.weather['max'] }}<br>
+                Wind speeds are at {{results.weather['wind']['speed']}} m/s and {{results.weather['wind']['deg']}} degrees.<br>
+                Humidity is at {{results.weather['humidity']}}% and a current atmospheric pressure of {{results.weather['pressure']['press']}}.
+              </small>
+              <br><br>
+            {% endif %}
+
+          </font>
+        {% endif %}
+              <!-- start map -->
+        {% if results.mapImageUrl %}
+            <div id="map"><img src={{results.mapImageUrl}} width=450px></div>
+        {% endif %}
+      </div>  <!-- end map -->
+
+      <div class="col-sm-6 col-sm-offset-1"> <!-- start rankings -->
+
+       {% if results.invalidZip == True %}  <!-- invalid zip code -->
+          <h2>Sorry! This looks like an invalid zipcode!</h2>
+          We currently only support major US zip codes and not
+          international areas.  Take a look at our FAQ to see how
+          we have gathered US weather data.  If you would like to 
+          support or collaborate in order to expand this project internationally,
+          please feel free to drop a line!
+
+        {% elif results.printFarms == False %} <!-- no reccs found -->
+          <h2>Sorry! No crop recommendations found!</h2>
+            Looks like we are either missing weather data for your zipcode 
+            and no significant crop recommendations were found.  Don't worry, 
+            it doesn't mean you can't be the first to start an organic farm!
+            Try another zipcode nearby?
+
+        {% elif results.zipcode %} <!-- print crop list table -->
+
+          <h2><img src="{{ url_for('static', filename='imgs/handgrow.png') }}" width=50px> Try farming...</h2>
+  
+          <div id="results">
+            <table class="table table-striped table-hover" style="max-width: 400;">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Crop</th>
+                  <!-- <th>Probability</th> -->
+              </thead>
+              <tr>
+              {% for pred in results.preds.values %}
+                <td>{{loop.index}}</td>
+                <td>{{pred[0]}}</td>
+                <!-- <td>{{pred[1]}}</td> -->
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+          <br> Our current model suggests that based on the weather data for this year, these were the crops and products successfully grown at organic farms most similar to your environment.<br>
+        {% endif %}
+      </div> 
+    </div> <!--end row div -->
+
+       <!-- end row :  location and rankings -->
+      <!-- start row: farm list -->
+
+      <div class="col-md-12">
+    <br><br>
+
+        {% if results.printFarms %}
+          <h2><img src="{{ url_for('static', filename='imgs/loc.png') }}" width=50px> List of Organic Farms in <span id="zip"></span> {{results.zipcode}}:</h2>
+          <br>
+          <div id="results">
+            <table class="table table-hover" style="max-width: 800px;">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Organization Name</th>
+                  <th>Address</th>
+                  <th>City</th>
+                  <th>State</th>
+                </tr>
+              </thead>
+              <tr>
+              {% for farm in results.farms.values %}
+                <td>{{loop.index}}</td>
+                <td>{{farm[4]}}</td>
+                <td>{{farm[5]}}</td>
+                <td>{{farm[6]}}</td>
+                <td>{{farm[7]}}</td>
+
+
+              </tr>
+              {% endfor %}
+            </table>
+            <br><br>
+          <br><p align="left"><font size=2px><a href="#top">back to top</a></font></p>
+        <br><br>
+          </div>
+          {% else %}
+          <br><br>
+
+        {% endif %}
+
+      </div> <!--end farm list div -->
+      {% endblock %}
+
+      <div id="push"></div>
+
+</div> <!--end container  div -->
+<!--       <div id="push"></div>
+ -->
+<div id="footer">
+  <div class="container">
+    <p class="text-muted credit"> <a href="/about">about</a> . <a href="/contact">contact</a> . <a href="/faq">faq</a> </p>
+    <BR>
+   <p class="text-muted credit">Copyright &copy; 2015 <a href="http://www.jasminehsu.net" target="_blank">Jasmine Hsu.</a><br>
+    Capstone project under the advisement of Professor <a href="http://www.cs.nyu.edu/shasha/" target="_blank">Dennis Shasha.</a></p>
+   <p class="text-muted credit">
+    Courant Institute of Mathematical Sciences<br>
+    New York University<br>
+    251 Mercer St, New York, NY 10012
+  </p>
+
+  </div>
+</div>
+
+
+
+</div> <!--end wrap  div -->
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script>
+  function cap(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+
+  var zipAPI = "http://ziptasticapi.com/{{results.zipcode}}";
+  var zipData;
+
+  $(document).ready(function(){
+          $.getJSON(zipAPI, function(result){
+              zipData = result;
+            $("span#zip").append(cap(zipData.city) + ", " + zipData.state);
+      });
+  });
+</script>
+</body>
+
+</html>

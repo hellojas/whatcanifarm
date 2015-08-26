@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!-- 
+@title: WHAT CAN I FARM? 
+@author: jasmine hsu
+@contact: jch550@nyu.edu
+-->
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% extends "index.html" %}
+{% block content %}
+
+<div class="container">
+<div class="row">
+
+  <div class="col-md-12">
+	<h1> Drop a line! </h1> <br>
+
+      	{% if results.status == "success" %}
+	<div class="alert alert-success"><strong><span class="glyphicon glyphicon-send"></span> Success! Message sent.</strong></div>	  
+	  	{% elif results.status == "error" %}
+
+    <div class="alert alert-danger"><span class="glyphicon glyphicon-alert"></span><strong> Error! Message not sent due to input error. Did you miscount the pigs? I'm not hiding any...</strong></div>
+  </div>
+  	{% endif %}
+
+  <form class="form-register" role="form" action="{{ url_for('contact') }}" method="post" >
+  	 {{ form.hidden_tag() }}
+
+    <div class="col-lg-6">
+      <div class="well well-sm"><strong>Required Field</strong></div>
+      <div class="form-group">
+        <label for="InputName">Your Name</label>
+        <div class="input-group">
+          <input type="text" class="form-control" name="name" id="InputName" placeholder="Enter Name" required>
+          <span class="input-group-addon"></span></div>
+      </div>
+      <div class="form-group">
+        <label for="InputEmail">Your Email</label>
+        <div class="input-group">
+          <input type="email" class="form-control" id="InputEmail" name="email" placeholder="Enter Email" required  >
+          <span class="input-group-addon"></i></span></div>
+      </div>
+      <div class="form-group">
+        <label for="InputMessage">Message</label>
+        <div class="input-group">
+          <textarea name="message" id="InputMessage" class="form-control" rows="5" required></textarea>
+          <span class="input-group-addon"></i></span></div>
+      </div>
+      <div class="form-group">
+        <label for="InputReal">(Bot check) How many pigs are on this page? Enter 0 or 1.</label>
+        <div class="input-group">
+          <input type="text" class="form-control" name="spam" id="InputReal" placeholder="Look to your right!" required>
+          <span class="input-group-addon"></span></div>
+      </div>
+      <input type="submit" name="submit" id="submit" value="Submit" class="btn btn-info pull-right">
+    </div>
+  </form>
+  <hr class="featurette-divider hidden-lg">
+  <div class="col-lg-6 col-md-push-1">
+    <address>
+    <h3>Location</h3>
+    <p class="lead"><a href="https://www.google.com/maps/place/Courant+Institute+of+Mathematical+Sciences/@40.728606,-73.9957205,17z/data=!3m1!4b1!4m2!3m1!1s0x89c259906cef3d29:0x92ae4b4cef3674db" target="_blank">Courant Institute of Mathematical Sciences<br>
+    New York University<br>
+New York, NY 10012</a><br>
+    </address>
+    <img width=200px src="{{ url_for('static', filename='imgs/pig.png') }}">
+  </div>
+</div>
+</div>
+
+
+{% endblock %}

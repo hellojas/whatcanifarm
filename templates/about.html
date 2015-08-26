@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!-- 
+@title: WHAT CAN I FARM? 
+@author: jasmine hsu
+@contact: jch550@nyu.edu
+-->
+
+{% extends "index.html" %}
+{% block content %}
+<div class="col-md-9 col-sm-offset-1">
+
+<h1> About </h1> <br>
+
+<p> <font size=4px> <b>"WHAT CAN I FARM?" </b> is a web application promoting organic and green farming.  Its ultimate goal is to provide aid to new farmers that are looking to grow organic crops, or simply just to learn what may be possible to grow effectively in their area.  We are a team of computer scientists and machine learning enthusiasts interested in producing an intelligent model that can learn, over time, particular weather and environmental features tied to certain array of crops or produce.  Our model was trained over six thousand weather stations throughout the nation and supplied with a list of currently grown crops at certified organic farms. The end user can simply enter their zipcode and then the application uses this model in order to intelligently produce crop recommendations that best matches the user's environment. </p>
+<br>
+<h3><b>Motivation</b></h3>
+<p>In order to understand the motivation behind this project, we must first understand what is green farming.
+
+<table class="table" style="max-width: 800; border:none;">
+	<tr align="center">
+		<thead>
+			<th><img src="{{ url_for('static', filename='imgs/no-routine-antibiotics.png') }}"></th>
+			<th><img src="{{ url_for('static', filename='imgs/no-growth-hormones.png') }}"></th>
+			<th><img src="{{ url_for('static', filename='imgs/non_gmo.png') }}"></th>
+		</thead> 
+	</tr>
+	<tr align="center">
+		<td>NO routine antibiotics</td>
+		<td>NO growth hormones</td>
+		<td>NON-GMO</td>
+	</tr>
+</table>
+
+    <blockquote><p>Organic agriculture is an ecological production management system that promotes and enhances biodiversity, biological cycles and soil biological activity. It is based on minimal use of off-farm inputs and on management practices that restore, maintain and enhance ecological harmony.</p><p><small>USDA.gov</small></p></blockquote>
+
+    <p>Our motivation is to build tools that use machine learning methods in order to support the current ecological movement of growing foods with minimum chemical intervention.  Thus, the project grew out of a need for an online resource that gathers information about "green" farms around the nation and provide these resources in a aggregated way to users. </p>
+<br>
+    <h3><b>Origin</b></h3>
+<p>The idea of this project was formulated by Dennis Shasha, a New York University professor in the Department of Computer Science at the Courant Institute of Mathematical Sciences. The project was undertaken by a computer science graduate student (me) as a program capstone in efforts of applying tools in machine learning, natural language processing, and big data analytics.</p>
+</font>
+<br><p align="left"><font size=2px><a href="#top">back to top</a></font></p>
+</br></br></br>
+</div>
+{% endblock %}
