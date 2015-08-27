@@ -22,7 +22,16 @@ import csv
 import pandas as pd
 import numpy as np
 
+'''
+parse options from the command line
+-f contains the header information for the DataFrame
+-z contains the nearby zipcodes for each zipcode
+-o is the output filename
+-q don't print 
 
+@return opt, options that are parsed
+@return args, extra unnparsed arguments
+'''
 def cmdLine():
 	parser = OptionParser()
 	parser.add_option("-f", "--file", dest="filename",
@@ -38,8 +47,17 @@ def cmdLine():
 
 	return opt, args
 
+'''
+starts with hardcoded default arguments which
+you can replace or you can simply run the script
+with the proper option arguments to replace them 
+in the cmd line
+
+@return weatherfile, contains feature values
+@return zipsfile, contains the nearby zipcodes
+@return out, output filename
+'''
 def setOptions():
-	'''set options collected by cmd line'''
 
 	opt, args =  cmdLine()
 	#set default locs
@@ -54,9 +72,20 @@ def setOptions():
 
 	return weatherfile, zipsfile, out
 
+'''
+impute values for a zipcode by averaging
+the values for zipcodes within 30 miles
+then replace empty values in the weather
+data file with these averages
+
+@param weather, the weather file
+@param zips, the nearby zipcodes
+@param out, output filename
+
+@outputfile, weather values updated
+by custom imputer method
+'''
 def runZips(weather, zips, out):
-	'''impute values for a zipcode by averaging
-	   the values for zipcodes within 30 miles'''
 
     c = 0
     for i, zip in enumerate(zips.values):

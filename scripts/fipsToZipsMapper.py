@@ -17,9 +17,16 @@ import csv
 import pandas as pd
 from set import Sets
 
-def mapper():
-    '''map zip codes to fips code'''
+'''
+map each zip code to the fips county code
+merge on column name "Fips_Code"
 
+@inputfile weather, data with one column "Fips_Code"
+@inputfile fzMap, one column "Fips_Code" with 
+correspoding zip code
+@outputfile weatherWithFips file 
+'''
+def mapper():
     weatherfile = "full_farms_dataset.csv"
     weather = pd.read_csv(weatherfile,header=0)
     fipsZipsFile = "zip_county.csv"

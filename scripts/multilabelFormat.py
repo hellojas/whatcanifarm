@@ -12,6 +12,14 @@ import pandas as pd
 import numpy as np
 import csv, sys
 
+'''
+parse options from the command line
+-f contains the header information for the DataFrame
+-q don't print 
+
+@return opt, options that are parsed
+@return args, extra unnparsed arguments
+'''
 def cmdLine():
 	parser = OptionParser()
 	parser.add_option("-f", "--file", dest="filename",
@@ -24,6 +32,14 @@ def cmdLine():
 
 	return opt, args
 
+'''
+read the farms file and clean it by
+removing the zip code column and dropping
+any duplicates
+
+@param filename, the farms filename
+@return farms, cleaned file
+'''
 def getFarms(filename):
 	'''retrieve farms file and drop duplicates'''
 
@@ -34,8 +50,24 @@ def getFarms(filename):
 	farms = farms.drop_duplicates()
 	return farms
 
+'''
+this is an alternative format where it
+generates two output files: one contains
+only the X values for a classifier and
+one contains only the y values for a 
+classifier. 
+
+the web application has a custom
+model object that uses this preprocessed
+file format to generate a model
+
+@param farms, the list of all farms with 
+their crops that they grow
+
+@outputfile a crops list (target values)
+@outputfile a features list (feature values)
+'''
 def generateCropsAndFeatures(farms):
-	'''collect unique crops by zipcode'''
 
 	print "generating crops and features..."
 
@@ -47,7 +79,7 @@ def generateCropsAndFeatures(farms):
 	csvwriter2 = csv.writer(newfile2)
 	csvwriter2.writerow(farms.columns[2:])
 
-	# get all unique crops for a single zip code
+	# get all unique crops for a single coop 
 	for count,zip in enumerate(farms['Coop'].unique()):
 	    allCropsWithZip = farms[farms['Coop'] == zip]
 	    crops =list(allCropsWithZip["Crop"].unique())

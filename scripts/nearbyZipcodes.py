@@ -21,16 +21,31 @@ from set import Sets
 DOMAIN = 'http://api.geonames.org/'
 USERNAME = 'hellojas' #enter your geonames username here
 
+'''
+fetch the json from the url using urllib
+to open the connection and retrieve 
+the data
+
+@params method, the urllib method
+@params params, parameters for urllib encoder
+@return js, json object
+'''
 def fetchJson(method, params):
-	'''fetch json from domain using urllib'''
 
     uri = DOMAIN + '%s?%s&username=%s' % (method, urllib.urlencode(params), USERNAME)
     resource = urllib2.urlopen(uri).readlines()
     js = json.loads(resource[0])
     return js
 
+'''
+fetchJson for a specific geonameId
+see geoname API for detailed exp
+
+@params geonameID, see geoname API
+@params kwargs, param for urllib
+@return js, json object
+'''
 def get(geonameId, **kwargs):
-	'''fetch json by geonam params'''
 
     method = 'getJSON'
     valid_kwargs = ('lang',)
@@ -40,6 +55,15 @@ def get(geonameId, **kwargs):
             params[key] = kwargs[key]
     return fetchJson(method, params)
 
+'''
+fetchJson for a specific geonameId
+but return the children
+see geoname API for detailed exp
+
+@params geonameID, see geoname API
+@params kwargs, param for urllib
+@return js, json object
+'''
 def children(geonameId, **kwargs):
     method = 'childrenJSON'
     valid_kwargs = ('maxRows', 'lang',)
@@ -54,6 +78,13 @@ def children(geonameId, **kwargs):
     else:
         return None
 
+'''
+search based on valid parameters
+for the geoname API
+
+@params kwargs, param for urllib
+@return js, json object
+'''
 def search(**kwargs):
     method = 'searchJSON'
     valid_kwargs = ('q', 'name', 'name_equals', 'name_startsWith', 'maxRows', 'startRow', 'country', 'countryBias', 'continentCode', 'adminCode1', 'adminCode2', 'adminCode3', 'featureClass', 'featureCode', 'lang', 'type', 'style', 'isNameRequired', 'tag', 'operator', 'charset',)
@@ -68,6 +99,13 @@ def search(**kwargs):
     else:
         return None
 
+'''
+fetch the json data for this 
+postal code query
+
+@params kwargs, param for urllib
+@return js, json object
+'''
 def postalCodeSearch(**kwargs):
 	'''fetch json by zipcode'''
 
@@ -84,6 +122,14 @@ def postalCodeSearch(**kwargs):
     else:
         return None
 
+'''
+fetch the json data for nearby 
+postal codes based on this 
+postal code query
+
+@params kwargs, param for urllib
+@return js, json object
+'''
 def findNearbyPostalCodes(**kwargs):
 	'''fetch nearby zipcodes'''
 
@@ -100,22 +146,15 @@ def findNearbyPostalCodes(**kwargs):
     else:
         return None
 
-def hierarchy(geonameId, **kwargs):
-    method = 'hierarchyJSON'
-    valid_kwargs = ('lang')
-    params = {'geonameId': geonameId}
-    for key in kwargs:
-        if key in valid_kwargs:
-            params[key] = kwargs[key]
-    results = fetchJson(method, params)
 
-    if('geonames' in results):
-        return results['geonames']
-    else:
-        return None
+'''
+find nearby postal codes for a given zipcode
 
+@params zc, zipcode to query
+@params r, the current list for that zipcode
+@outputfile nearby zipcodes for each zipcode
+'''
 def runZip(zc, r): 
-	'''write out nearby zipcodes'''
 
     result = findNearbyPostalCodes(postalcode=zc,radius=r,country="US",maxRows=100)
 
@@ -132,8 +171,16 @@ def runZip(zc, r):
             nearby.append(r["postalCode"])
         zipWriter2.writerow([zc] + [",".join(nearby[1:])])
 
+'''
+find nearby postal codes for all zipcodes
+at a set radius limit
+
+@params radius, limit of nearby zipcodes
+@outputfile nearby zipcodes for each zipcode
+@outputfile nearby zipcodes for each zipcode, 
+simplified file
+'''
 def getNearbyZips(radius):
-	'''get nearby zipcodes with set radius (30 max)'''
 
 	missing = []
 
@@ -156,5 +203,5 @@ def getNearbyZips(radius):
 	f2.close()
 
 if __name__ == "__main__":
-	getNearbyZips(30) # 30 is max for geonames
+	getNearbyZips(30) 
 

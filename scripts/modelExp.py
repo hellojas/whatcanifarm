@@ -37,6 +37,20 @@ from sklearn.externals import joblib
 from sklearn.svm import SVC 
 import pickle
 
+'''
+dataset class that facilitates the input for
+sklearn classifiers;
+
+the classifier will use:
+X = the values
+y = the target label_ranking_average_precision_score
+X_imp = the values after a mean imputer
+y_bin = target values after MultiLabelBinarizer
+
+@param filename, is filename with features (X)
+@param cropsfile, is target labels
+@param name, is name of this dataset
+'''
 class dataset():
     def __init__(self,filename,cropsfile,name):
 #         self.dir = dir
@@ -52,6 +66,12 @@ class dataset():
         self.n_samples = 0
         self.n_features = 0
 
+
+    '''
+    read the dataset
+    run this method after init dataset()
+    to read the files into the variables
+    '''
     def read(self):
         dataset = pd.read_csv(self.filename, header =0, index_col=0)
         crops = pd.read_table(self.cropsfile, header=None, index_col=None)
@@ -67,35 +87,89 @@ class dataset():
                 if len(re.sub(r'\W+', ' ', x.replace("\'","")).strip()) != 0:
                     newlist.append(re.sub(r'\W+', ' ', x.replace("\'","")).strip())
             self.y.append(newlist)
+
+    '''
+    run an imputer on missing values for X values
+    run this method after self.read()
+    sets X_imp value automatically
+
+    @param imp_type can be 'mean', 'mode' 
+    @see sklearn docs for detailed exp
+    '''        
     def imputer(self,imp_type):
         imp = Imputer(missing_values='NaN', strategy=imp_type)
         self.X_imp = imp.fit_transform(self.X, self.y)
 
+'''
+generates a decision tree classifier 
+based on a given dataset
 
+@see sklearn docs for detailed exp
+@param dataset, dataset() class after read()
+@return clf, the classifier generated
+'''   
 def decisionTree(dataset):
     print ("generating decision tree...")
     clf = tree.DecisionTreeClassifier()
     clf = clf.fit(dataset.X_imp,dataset.y)
     return clf
-    
+ 
+'''
+exports a PDF for the decision tree to
+visualize the splitting and feature hiearchy
+
+@param clf, the decision tree classifier 
+@param dataset, dataset() class after read()
+@param fileout, the file to save to
+@outputfile, pdf file
+'''     
 def toPdf(clf,dataset,fileout):
     dot_data = StringIO() 
     tree.export_graphviz(clf, out_file=dot_data, feature_names=dataset.featureNames) 
     graph = pydot.graph_from_dot_data(dot_data.getvalue()) 
     graph.write_pdf("RF_all_multilabel_2014/"+fileout+".pdf") 
-    
+
+'''
+pretty print the top ten in a list
+assumes it is sorted descending
+
+@param L, sorted list descending
+'''     
 def printTopTen(L):
     for i,l in enumerate(L):
         print l
         if i == 10:
             break
 
+'''
+loops through a one vs all classifier for
+all classifiers and generates a pdf for each
+tree
+
+@param OVR_Clf, the one v all classifier
+@param mlb, the MultiLabelBinarizer used
+@param modelData, a dataset() object
+'''     
 def genAllPdfs(OVR_Clf, mlb, modelData):
     print ("writing to pdf...")
     for i,dt in enumerate(OVR_Clf.estimators_[50:100]): 
         if type(dt) is DecisionTreeClassifier:
             toPdf(dt, modelData,mlb.classes_[i][0:80])
  
+'''
+* NOTE this object is used in the web app *
+
+the model object that saves everything needed to
+faciliate the web application 
+
+required:
+input = values to predict on for each zipvode,
+i.e. new weather conditions (not trained on)
+classifier = the one v all classifier
+validZips = restricting what zipcodes the user can enter
+farms = list of organic farms by zipcode
+mlb = MultiLabelBinarizer used for the classifier
+'''   
  class model():
     def __init__(self, input, classifier, mlb, validZips, us_farms ):
         self.input = input
@@ -103,14 +177,36 @@ def genAllPdfs(OVR_Clf, mlb, modelData):
         self.validZips = validZips
         self.farms = us_farms
         self.mlb = mlb
+
+    '''
+    gets a list of organic farms by zipcode
+    @param zip, the zipcode to query
+    @return the list of farms for that zipcode
+    '''  
     def getFarms(self, zip):
          return self.farms[self.farms["Zip_Code"] == int(zip)]
+
+    '''
+    validates the zipcode query in validZips 
+    and return the feature vector
+    @param zip, the zipcode to query
+    @return the feature vector for the zipcode
+    if is valid or None
+    '''  
     def submitZip(self, zip):
         if int(zip) in self.validZips:
             return self.input[self.input.index==int(zip)]
         else:
             return None
-    def predict(self,x_input):
+
+    '''
+    use the classifier to predict the probabilities
+    based on the input returned from submitZip
+    @param x_input, from submitZip
+    @param limit, limit the returned list to top #
+    @return top # of rankings
+    '''  
+    def predict(self,x_input,limit):
         prediction = np.zeros(x_input.shape[1])
         x = x_input
         probabilities = np.zeros(self.mlb.classes_.shape)
@@ -119,11 +215,12 @@ def genAllPdfs(OVR_Clf, mlb, modelData):
 #         prediction[i] = np.argmax( probabilities )
         rankings = zip(self.mlb.classes_, probabilities)
         rankings.sort(key=lambda x: x[1],reverse=True)
-        return rankings[0:10]
+        return rankings[0:limit]
 #         printTopTen(zipped)
                
 
 if __name__ == "__main__":
+
 	weatherImpMean = pd.read_csv("weather2015.csv")
 	zips = pd.read_csv("us_zips.csv")
 	us_farms = pd.read_csv("us_farms.csv")
@@ -164,6 +261,7 @@ if __name__ == "__main__":
 	print farms
 	print pred
 
+    ## dump for model using pickle
 	# joblib.dump(weatherImpMean, 'input.pkl', compress=9)
 	# joblib.dump(OVR_Clf_RF, 'classifier.pkl', compress=9)
 	# joblib.dump(mlb, 'mlb.pkl', compress=9)

@@ -16,7 +16,16 @@ import sys, os
 import re as re
 import pandas as pd
 
+'''
+parse options from the command line
+-f contains list of organic farms with zipcode
+-d contains the directory where the file is and will be saved
+-o is the output filename
+-q don't print 
 
+@return opt, options that are parsed
+@return args, extra unnparsed arguments
+'''
 def cmdLine():
 	parser = OptionParser()
 	parser.add_option("-f", "--file", dest="filename",
@@ -32,8 +41,17 @@ def cmdLine():
 
 	return opt, args
 
+'''
+starts with hardcoded default arguments which
+you can replace or you can simply run the script
+with the proper option arguments to replace them 
+in the cmd line
+
+@return filename, list of organic farms with county
+@return dir, directory of file and where to save output
+@return out, output filename
+'''
 def setOptions():
-	'''set options collected by cmd line'''
 
 	opt, args =  cmdLine()
 	#set default locs
@@ -46,11 +64,18 @@ def setOptions():
 	dir = opt.dir if opt.dir else dir
 	out = opt.output if opt.output else out
 
-	return filename, header, out
+	return filename, dir, out
 
+'''
+uses regex to clean the label names as well as 
+strip extra whitespace.  all label names are
+converted to lowercase.
 
+@params s, the string to clean
+@param rep, a dictionary of words to remove
+@return the cleaned string
+'''
 def clean(s, rep):
-	'''clean crop strings'''
 
 	# removeWords = dict({"handling ":"","products ":"","marketing/trading of \"organic\" ":"","brokering of organic products - ":" "})
 	# removeWords = dict({"handling ":"","products ":"","trading ":"","brokering ":""})
@@ -62,8 +87,20 @@ def clean(s, rep):
     
     return s.lower().strip()
 
+'''
+for each crop, a zipcode will be matched to it
+if the crop is in several zipcodes, it will be listed
+for each unique zipcode it belongs too
+this is to produce an input format for the 
+machine learning model
+
+@param, myfile, the file with a croplist and zipcode 
+@param, myfilesize, len of file
+@param output, output file name
+
+@output csv written to disk
+'''
 def generateCropToZipMap(myfile,myfilesize,output):
-	'''generate a crop to zip code mapping'''
 
 	crops = dict()
 	for row in range(0,myfileSize)[0:50]:

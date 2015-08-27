@@ -21,7 +21,8 @@ countiesAll <- farms$County
 data <- ncdc_stations(datasetid='GHCND', locationid=paste("FIPS:",farms$County[123],sep=""))
 
 ##################################### 
-# ANNUAL STUFF
+# get annual weather data for each
+# fips code and sae it to csv
 ##################################### 
 counties <- unique(farms$County)
 setwd("~/school/green_farms/weather_county_annual_2015")
@@ -48,9 +49,6 @@ for(fips in counties) {
   }
   Sys.sleep(5)
 }
-
-
-
 
 
 ##################################### 
