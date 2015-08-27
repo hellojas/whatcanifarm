@@ -12,7 +12,7 @@
 <h1 >FAQ </h1><br>
 <img src="{{ url_for('static', filename='imgs/cow.png') }}" height=100px class="imageCenter"></img>
 
-<h3><b><span class="question"> Where did you get your weather/environment data?</span></b></h3>
+<h3><b><span class="question"> Where did you get your weather and environment data?</span></b></h3>
 
 <p>The weather data was aggregated from over six thousand NOAA weather stations throughout the nation. </p>
 
@@ -23,7 +23,7 @@
 <p>The model was built using a one vs all classifier for each target label; several types of classifiers were tested: decision trees, random forrest, SVC. </p>
 
 <h3><b>How are the rankings generated?</b></h3>
-<p>The model produces a prediction probability for each target label (i.e. crop / product) since essentially, each target has its own classifier.  Then, the probability predictions are sorted to sorted to get the ten largest probabilities, which correspond to the rankings you see returned. </p>
+<p>The model produces a prediction probability for each target label (i.e. crop / product) since essentially, each target has its own classifier.  Then, the probability predictions are sorted to get the ten largest probabilities, which correspond to the rankings you see returned. </p>
 
 <h3><b><span class="question">What is your technology stack?</span></b></h3>
 <p>The web application is built using the Flask framework deployed with Heroku. Details at: <a href="http://stackshare.io/hellojas/what-can-i-farm" target="_blank">Stackshare.</a> </p>
@@ -31,7 +31,7 @@
 <h3><b>How long did this project take?</b></h3>
 <p>The project was a three month long effort, which encapsulated various stages of the product development pipeline: industry research, data collection, data preprocessing, model experimentation (machine learning), product design, web application development, & user testing. </p>
 
-<h3><b><span class="question">Can I use this for ___? I'm interested in collaborating</span></b></h3>
+<h3><b><span class="question">Can I use this for ___? I'm interested in collaborating!</span></b></h3>
 <p><a href="/contact" target="_blank">Drop us a line!</a> </p>
 <br>
 <img src="{{ url_for('static', filename='imgs/cow.png') }}" height=100px class="imageCenter"></img>
@@ -40,4 +40,5 @@
 </br></br></br>
 
 </div>
+
 {% endblock %}

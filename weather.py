@@ -11,7 +11,7 @@ import pyowm
 import keys
 import dateutil.parser
 
-# map to icons for display
+# map to icons for display in widget
 ICONMAP = {
   '01d':'wi-day-sunny',
   '02d':'wi-day-cloudy',
@@ -33,12 +33,26 @@ ICONMAP = {
   '50n':'wi-fog',
 }
 
-# weather object that holds stats
+'''
+This is a weather object that acts
+as the mini widget on the web application
+to retrieve quick stats about the queried
+zipcode 
+
+init by setting the PWOWM api key
+'''
 class Weather(object):
   
   def __init__(self):
     self.owm = pyowm.OWM(keys.OWM_API_KEY)
   
+  '''
+  get the data from the server with
+  the queried zipcode and parses
+  the forecast and json into
+  a dictionary
+  @param zipcode, the query zipcode
+  '''
   def update(self, zipcode):
     '''Get data from the server'''
     zipcode = str(zipcode)
@@ -51,12 +65,22 @@ class Weather(object):
     self.data = self.parse(current)
     self.data["forecast"] = [(weather.get_reference_time('iso').split(" ")[0],weather.get_status()) 
     	for weather in forecast]
-    
+  
+  '''
+  return the current data
+  @return data
+  '''
   def display(self):
     return self.data
   
+  '''
+  parse the owm weather object for each
+  key that we have queried and then set it into
+  an organized dict with its values
+  @param w, pyowm weather object
+  @return data as a dict
+  '''
   def parse(self, w):
-    '''parse the owm weather object'''
     temp = w.get_temperature('fahrenheit')
     if 'temp_min' in temp:
       temp = dict(day=temp['temp'],

@@ -21,13 +21,15 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.externals import joblib
 import keys
 import cPickle, urllib2
-## model class that holds
-# input = this years weather data by zip code
-# classifier = the random forrest classifier
-# mlb = the lable binarizer
-# validZips = list of US zipcodes
-# us_farms = list of ceritified US organic farms 
 
+'''
+model class that holds
+input = this years weather data by zip code
+classifier = the random forrest classifier
+mlb = the lable binarizer
+validZips = list of US zipcodes
+us_farms = list of ceritified US organic farms 
+'''
 class model(object):
     def __init__(self, input, classifier, mlb, validZips, us_farms ):
         self.input = input
@@ -36,10 +38,21 @@ class model(object):
         self.farms = us_farms
         self.mlb = mlb
 
+    '''
+    gets a list of organic farms by zipcode
+    @param zip, the zipcode to query
+    @return the list of farms for that zipcode
+    '''  
     def getFarms(self, zip):
-        '''gets the farms by zipcode'''
         return self.farms[self.farms["Zip_Code"] == int(zip)]
-
+    
+    '''
+    validates the zipcode query in validZips 
+    and return the feature vector
+    @param zip, the zipcode to query
+    @return the feature vector for the zipcode
+    if is valid or None
+    '''  
     def submitZip(self, zip):
         '''validate the zipcode'''
         if int(zip) in self.validZips:
@@ -47,6 +60,13 @@ class model(object):
         else:
             return None
 
+    '''
+    use the classifier to predict the probabilities
+    based on the input returned from submitZip
+    @param x_input, from submitZip
+    @param limit, limit the returned list to top #
+    @return top # of rankings
+    '''          
     def predict(self,x_input,limit):
         '''load data into model and output probabilities'''
         x = x_input
@@ -57,7 +77,12 @@ class model(object):
         rankings.sort(key=lambda x: x[1],reverse=True)
         return rankings[0:limit]
 
-# this loads the model with the proper pickle dumps
+'''
+load the model with the pickle dumps
+the resource directory is assumed to be in 
+the static folder under subfolder res
+@return the model() object
+'''     
 def loadModel():
     resources_dir = os.getcwd() + "/static/res/" # main resource directory
     # aws_app_assets = "https://%s.s3.amazonaws.com/static/res/" % keys.AWS_BUCKET_NAME

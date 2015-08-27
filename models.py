@@ -8,6 +8,11 @@
 from app import db
 from sqlalchemy.dialects.postgresql import JSON
 
+# this is an object that can
+# be persisted into a postgres data
+# base. the developer can choose
+# to persist the user zipcode query
+# and model predictions is necessary
 
 class Result(db.Model):
     __tablename__ = 'results'

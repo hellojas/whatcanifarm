@@ -7,6 +7,8 @@
 
 import os
 
+# this is the base configuration 
+# for all deployments
 class Config(object):
     DEBUG = False
     TESTING = False

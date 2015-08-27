@@ -63,6 +63,7 @@ app_email = keys.APP_EMAIL
 # conditions based on zipcode
 weatherModel = Weather()
 
+# @param zipcode, zipcode to query
 def getWeather(zipcode):
     weatherModel.update(zipcode)
     return weatherModel.display()
@@ -70,40 +71,59 @@ def getWeather(zipcode):
 ##########
 # routes #
 ##########
+
+# the about page
+# renders about.html
 @app.route('/about', methods=['GET'])
 def about():
     results = {} # data struct to hold vars
     return render_template('about.html', results=results)
 
+# the contact page, generates email to recipient
+# renders contact.html
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
     results = {} # data struct to hold vars
     form = ContactForm()
     results["status"] = None
 
+    # get all the data from what the user entered
+    # onto the form and validate the spam checker
     if request.method == 'POST':
         print form.spam.data
+
+        # validate the spam checker
+        # return error if it is not correct
         if form.spam.data != "1":
             results["status"] = "error"
             form.name.data = form.name.data
             return render_template('contact.html', results=results, form=form)
+
+        # if pass the spam checker, generate a message and send it
         msg = Message("[whatcanifarm] email has arrived!", sender=app_email, recipients=[app_email])
         msg.body = """ 
         From: %s <%s> 
         %s
         """ % (form.name.data, form.email.data, form.message.data)
         mail.send(msg)
+
+        # set success status and render the same page with the success alert
         results["status"] = "success"
         return render_template('contact.html', results=results, form=form)
+
     elif request.method == 'GET':
         return render_template('contact.html', results=results, form=form)
 
+# the faq page, renders faq.html
 @app.route('/faq', methods=['GET'])
 def faq():
     results = {} # data struct to hold vars
     return render_template('faq.html', results=results)
 
-
+# the home page, renders index.html
+# at the start of the root page,
+# the model will run a live prediction when
+# the user enters a zipcode to query
 @app.route('/', methods=['GET', 'POST'])
 def index():
     # set initial variables
@@ -131,6 +151,7 @@ def index():
             mapImageUrl = 'http://maps.googleapis.com/maps/api/staticmap?center=%s&zoom=13&scale=1&size=500x300&maptype=hybrid&format=png&visual_refresh=true&markers=size:mid|color:0xff0000|label:A|%s' %(zipcode,zipcode)
             
             # model and weather computations
+            # see modelExp.py for object method descriptions
             x = mymodel.submitZip(int(zipcode))
             if x is None: 
                 invalidZip = True 
@@ -141,15 +162,15 @@ def index():
                     weather = getWeather(zipcode)
                     printFarms = True
 
-            # hold computations        
+            # hold computations and push to jinja
             results = {"zipcode":zipcode, "mapImageUrl":mapImageUrl, 
                 "farms":farmsList, "preds":pred, "printFarms":printFarms, "invalidZip":invalidZip,
                 "weather":weather}
         except:
+            # display errors if zipcode is not found
             errors.append("No data for this zipcode, try another?")
             return render_template('index.html', errors=errors)
     return render_template('index.html', errors=errors, results=results)
-
 
 
 if __name__ == '__main__':
