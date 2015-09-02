@@ -128,7 +128,7 @@ def faq():
 def index():
     # set initial variables
     results = {} # data struct to hold vars
-    errors = [] # errors
+    errors = False # errors
     farmsList = pd.DataFrame() # list of local farms
     pred = pd.DataFrame() # generated predictions
     weather = {} # weather data
@@ -148,6 +148,11 @@ def index():
 
         try:
             zipcode = request.form['zip']
+
+            if not zipcode.isdigit():
+                results["errors"] = "Not a valid zipcode. Must be numeric! Try again?"
+                errors = True
+                return render_template('index.html', errors=errors, results=results)
             mapImageUrl = 'http://maps.googleapis.com/maps/api/staticmap?center=%s&zoom=13&scale=1&size=500x300&maptype=hybrid&format=png&visual_refresh=true&markers=size:mid|color:0xff0000|label:A|%s' %(zipcode,zipcode)
             
             # model and weather computations
@@ -168,8 +173,9 @@ def index():
                 "weather":weather}
         except:
             # display errors if zipcode is not found
-            errors.append("No data for this zipcode, try another?")
-            return render_template('index.html', errors=errors)
+            errors = True
+            results["errors"] = "No data for this zipcode, try another?"
+            return render_template('index.html', errors=errors,  results=results)
     return render_template('index.html', errors=errors, results=results)
 
 
