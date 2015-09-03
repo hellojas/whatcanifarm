@@ -13,4 +13,4 @@ The idea of this project was formulated by Dennis Shasha, a New York University 
 
 ## DEMO
 
-https://what-can-i-farm.herokuapp.com/
+https://www.whatcanifarm.com
